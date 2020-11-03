@@ -46,6 +46,9 @@ class IEMOCAPDataset(Dataset):
 
         self.len = len(self.ids)
 
+    def __len__(self):
+        return self.len
+
     def __getitem__(self, index):
         key = self.ids[index]
         if self.stream == 'J':
