@@ -21,6 +21,7 @@ class EarlyStopping:
         else:
             mvalue = value
             mmonitor = self.monitor
+
         if self.monitor > mvalue:
             if (self.save_path is not None) & (model is not None):
                 torch.save(model.state_dict(), self.save_path)
@@ -59,6 +60,7 @@ class Train_Eval_Model:
         self.lr = lr
         self.device = device
         self.lr_scheduler = lr_scheduler
+
         if optim == 'adam':
             self.optimizer = torch.optim.Adam(self.model.parameters(),
                                               lr=self.lr)
@@ -72,6 +74,7 @@ class Train_Eval_Model:
             self.loss_func = loss_func
         else:
             self.loss_func = torch.nn.CrossEntropyLoss()
+
         if lr_scheduler:
             self.scheduler = torch.optim.lr_scheduler.MultiStepLR(
                 self.optimizer, milestones=[60, 90], gamma=0.1)
@@ -87,10 +90,12 @@ class Train_Eval_Model:
 
     def _train_eval_step(self, dataloader, train=True, eval=False):
         losses, preds, labels = [], [], []
+
         if train:
             self.model.train()
         else:
             self.model.eval()
+
         for data in dataloader:
             y = data[-2].to(self.device)
             inputs = [
@@ -114,6 +119,7 @@ class Train_Eval_Model:
             if eval:
                 preds.extend(outputs.cpu().detach().numpy())
                 labels.extend(y.cpu().numpy())
+
         avg_loss = np.average(losses)
 
         if eval:
@@ -139,6 +145,7 @@ class Train_Eval_Model:
 
         if earlystop is not None:
             earlystop.reset()
+
         for epoch in range(epoch_num):
             start_time = time.time()
 
@@ -196,6 +203,7 @@ class Train_Eval_Model:
 
         print('[Info] Training finished.')
         print('[Info] Test performance: Acc: {}'.format(max(test_acc_his)))
+        
         if earlystop is not None:
             self.model.load_state_dict(torch.load(earlystop.save_path))
             loss, accuracy, labels, preds = self._train_eval_step(test_loader,
