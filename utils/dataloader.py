@@ -1,4 +1,5 @@
 import pickle
+import os
 
 import numpy as np
 import torch
@@ -24,4 +25,18 @@ def get_IEMO_dataloaders(dataset=None, batch_size=2, stream='J'):
 class IEMOCAPDataset(Dataset):
     def __init__(self, path='/home/shi/git/s-stgcn/data', stream='J', sub_set=0):
 
+        self.stream = stream
+
         pkls = ['motion_test.pkl','motion_val.pkl','motion_test.pkl']
+        pkl_path = os.path.join(path, pkls[sub_set])
+
+        with open(pkl_path,'rb') as f:
+            self.ids, self.skeletonData, self.labels = pickle.load(f)
+        
+        if stream is 'B':
+            
+
+        self.len = len(self.ids)
+    
+    def __getitem__(self, index):
+        key = self.ids[index]
