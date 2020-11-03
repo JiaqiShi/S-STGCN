@@ -52,11 +52,15 @@ class IEMOCAPDataset(Dataset):
     def __getitem__(self, index):
         key = self.ids[index]
         if self.stream == 'J':
-            return torch.FloatTensor(self.jointData[key]), torch.tensor(
-                self.labels[key], dtype=torch.long), i
+            return torch.FloatTensor(self.jointData[key]),\
+                     torch.tensor(self.labels[key], dtype=torch.long),\
+                     key
         elif self.stream == 'B':
-            return torch.FloatTensor(self.boneData[key]), torch.tensor(
-                self.labels[key], dtype=torch.long), i
+            return torch.FloatTensor(self.boneData[key]),\
+                     torch.tensor(self.labels[key], dtype=torch.long),\
+                     key
         else:
-            return torch.FloatTensor(self.jointData[key]), torch.FloatTensor(self.boneData[key]),\
-                 torch.tensor(self.labels[key], dtype=torch.long), i
+            return torch.FloatTensor(self.jointData[key]),\
+                    torch.FloatTensor(self.boneData[key]),\
+                    torch.tensor(self.labels[key], dtype=torch.long),\
+                    key
