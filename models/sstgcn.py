@@ -30,12 +30,7 @@ class SSTGCN(nn.Module):
         kwargs0 = {k: v for k, v in kwargs.items() if k != 'dropout'}
 
         self.blocks = nn.ModuleList(
-            (GraphConvBlock(in_channels,
-                            32,
-                            kernel_size,
-                            1,
-                            residual=False,
-                            **kwargs0),
+            (GraphConvBlock(in_channels, 32, kernel_size, 1, residual=False, **kwargs0),
              GraphConvBlock(32, 32, kernel_size, 1, **kwargs),
              GraphConvBlock(32, 32, kernel_size, 1, **kwargs),
              GraphConvBlock(32, 32, kernel_size, 1, **kwargs),
