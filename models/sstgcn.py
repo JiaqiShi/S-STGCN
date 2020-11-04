@@ -2,14 +2,24 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
+
 #%%
 class SSTGCN(nn.Module):
-
-    def __init__(self, in_channels, num_class, graph_args, edge_importance_weighting=True, **kwargs):
+    def __init__(self,
+                 in_channels,
+                 num_class,
+                 graph_args,
+                 edge_importance_weighting=True,
+                 **kwargs):
         super().__init__()
 
         self.graph = Graph(**graph_args)
-        self.register_buffer('A', torch.tensor(self.graph.A, dtype=torch.float32, requires_grad=False))
+        self.register_buffer(
+            'A',
+            torch.tensor(self.graph.A,
+                         dtype=torch.float32,
+                         requires_grad=False))
 
         spatial_kernel_size = A.size(0)
         temporal_kernel_size = 9
@@ -19,21 +29,26 @@ class SSTGCN(nn.Module):
 
         kwargs0 = {k: v for k, v in kwargs.items() if k != 'dropout'}
 
-        self.blocks = nn.ModuleList((
-            GraphConvBlock(in_channels, 32, kernel_size, 1, residual=False, **kwargs0),
-            GraphConvBlock(32, 32, kernel_size, 1, **kwargs),
-            GraphConvBlock(32, 32, kernel_size, 1, **kwargs),
-            GraphConvBlock(32, 32, kernel_size, 1, **kwargs),
-            GraphConvBlock(32, 64, kernel_size, 2, **kwargs),
-            GraphConvBlock(64, 64, kernel_size, 1, **kwargs),
-            GraphConvBlock(64, 64, kernel_size, 1, **kwargs),
-            GraphConvBlock(64, 128, kernel_size, 2, **kwargs),
-            GraphConvBlock(128, 128, kernel_size, 1, **kwargs),
-            GraphConvBlock(128, 128, kernel_size, 1, **kwargs)
-        ))
+        self.blocks = nn.ModuleList(
+            (GraphConvBlock(in_channels,
+                            32,
+                            kernel_size,
+                            1,
+                            residual=False,
+                            **kwargs0),
+             GraphConvBlock(32, 32, kernel_size, 1, **kwargs),
+             GraphConvBlock(32, 32, kernel_size, 1, **kwargs),
+             GraphConvBlock(32, 32, kernel_size, 1, **kwargs),
+             GraphConvBlock(32, 64, kernel_size, 2, **kwargs),
+             GraphConvBlock(64, 64, kernel_size, 1, **kwargs),
+             GraphConvBlock(64, 64, kernel_size, 1, **kwargs),
+             GraphConvBlock(64, 128, kernel_size, 2, **kwargs),
+             GraphConvBlock(128, 128, kernel_size, 1, **kwargs),
+             GraphConvBlock(128, 128, kernel_size, 1, **kwargs)))
 
         if edge_importance_weighting:
-            self.edge_importance = nn.ParameterList([nn.Parameter(torch.ones(self.A.size())) for i in self.blocks])
+            self.edge_importance = nn.ParameterList(
+                [nn.Parameter(torch.ones(self.A.size())) for i in self.blocks])
         else:
             self.edge_importance = [1] * len(self.blocks)
 
@@ -57,8 +72,8 @@ class SSTGCN(nn.Module):
 
         return x, hiddens
 
-class GraphConvBlock(nn.Module):
 
+class GraphConvBlock(nn.Module):
     def __init__(self,
                  in_channels,
                  out_channels,
@@ -70,11 +85,17 @@ class GraphConvBlock(nn.Module):
                  gate=True,
                  n_head=4,
                  d_kc=0.25,
-                 d_vc=0.25
-                 ):
+                 d_vc=0.25):
         super().__init__()
 
-        self.ssgc = SSGC(in_channels, out_channels, kernel_size[1], attbranch=True, gate=True, n_head=4, d_kc=0.25, d_vc=0.25)
+        self.ssgc = SSGC(in_channels,
+                         out_channels,
+                         kernel_size[1],
+                         attbranch=True,
+                         gate=True,
+                         n_head=4,
+                         d_kc=0.25,
+                         d_vc=0.25)
 
         self.tcn = nn.Sequential(
             nn.Conv2d(
@@ -96,11 +117,10 @@ class GraphConvBlock(nn.Module):
 
         else:
             self.residual = nn.Sequential(
-                nn.Conv2d(
-                    in_channels,
-                    out_channels,
-                    kernel_size=1,
-                    stride=(stride, 1)),
+                nn.Conv2d(in_channels,
+                          out_channels,
+                          kernel_size=1,
+                          stride=(stride, 1)),
                 nn.BatchNorm2d(out_channels),
             )
 
@@ -114,8 +134,8 @@ class GraphConvBlock(nn.Module):
 
         return self.relu(x)
 
-class SSGC(nn.Module):
 
+class SSGC(nn.Module):
     def __init__(self,
                  in_channels,
                  out_channels,
@@ -129,8 +149,7 @@ class SSGC(nn.Module):
                  gate=True,
                  n_head=4,
                  d_kc=0.25,
-                 d_vc=0.25
-                 ):
+                 d_vc=0.25):
         super().__init__()
 
         self.kernel_size = kernel_size
@@ -143,27 +162,31 @@ class SSGC(nn.Module):
             d_kc = 1
             d_vc = 1
 
-        self.conv = nn.Conv2d(
-            in_channels,
-            out_channels * kernel_size,
-            kernel_size=(t_kernel_size, 1),
-            padding=(t_padding, 0),
-            stride=(t_stride, 1),
-            dilation=(t_dilation, 1),
-            bias=bias)
+        self.conv = nn.Conv2d(in_channels,
+                              out_channels * kernel_size,
+                              kernel_size=(t_kernel_size, 1),
+                              padding=(t_padding, 0),
+                              stride=(t_stride, 1),
+                              dilation=(t_dilation, 1),
+                              bias=bias)
 
         if attbranch is True:
-            self.att = SelfAttentionBranch(n_head, d_in=in_channels, d_out=out_channels, d_k=int(d_kc*out_channels), d_v=int(out_channels*d_vc), residual=True, res_fc=False)
+            self.att = SelfAttentionBranch(n_head,
+                                           d_in=in_channels,
+                                           d_out=out_channels,
+                                           d_k=int(d_kc * out_channels),
+                                           d_v=int(out_channels * d_vc),
+                                           residual=True,
+                                           res_fc=False)
 
         if gate is True:
             print('[Info] gate activated.')
-            g = nn.Parameter(torch.tensor(1.0, dtype=torch.float32), requires_grad=True)
+            g = nn.Parameter(torch.tensor(1.0, dtype=torch.float32),
+                             requires_grad=True)
             self.register_parameter('g', g)
 
-        self.out = nn.Sequential(
-            nn.BatchNorm2d(out_channels),
-            nn.ReLU(inplace=True)
-        )
+        self.out = nn.Sequential(nn.BatchNorm2d(out_channels),
+                                 nn.ReLU(inplace=True))
 
     def forward(self, x, A):
 
@@ -172,19 +195,19 @@ class SSGC(nn.Module):
         f_c = self.conv(inp)
 
         N, KC, T, V = f_c.size()
-        f_c = f_c.view(N, self.kernel_size, KC//self.kernel_size, T, V)
+        f_c = f_c.view(N, self.kernel_size, KC // self.kernel_size, T, V)
         f_c = torch.einsum('nkctv,kvw->nctw', (f_c, A))
 
         if self.attbranch:
             N, C, T, V = inp.size()
-            f_a = inp.permute(0, 2, 3, 1).contiguous().view(N*T, V, C)
+            f_a = inp.permute(0, 2, 3, 1).contiguous().view(N * T, V, C)
             f_a, _ = self.att(f_a, f_a, f_a)
-            f_a = f_a.view(N, T, V, -1).permute(0, 3, 1, 2) # N, C, T, V
+            f_a = f_a.view(N, T, V, -1).permute(0, 3, 1, 2)  # N, C, T, V
 
             if self.gate:
-                f = (f_a*self.g+f_c)/2
+                f = (f_a * self.g + f_c) / 2
             else:
-                f = (f_a+f_c)/2
+                f = (f_a + f_c) / 2
         else:
             f = f_c
 
@@ -192,9 +215,18 @@ class SSGC(nn.Module):
 
         return f
 
-class SelfAttentionBranch(nn.Module):
 
-    def __init__(self, n_head, d_in, d_out, d_k, d_v, residual=True, res_fc=False, dropout=0.1, att_dropout=0.1):
+class SelfAttentionBranch(nn.Module):
+    def __init__(self,
+                 n_head,
+                 d_in,
+                 d_out,
+                 d_k,
+                 d_v,
+                 residual=True,
+                 res_fc=False,
+                 dropout=0.1,
+                 att_dropout=0.1):
         super().__init__()
 
         self.n_head = n_head
@@ -212,10 +244,11 @@ class SelfAttentionBranch(nn.Module):
 
         self.fc = nn.Linear(n_head * d_v, d_out, bias=False)
 
-        self.attention = ScaledAttention(temperature=d_k ** 0.5)
+        self.attention = ScaledAttention(temperature=d_k**0.5)
 
         if residual:
-            self.res = nn.Linear(d_in, d_out) if res_fc or (d_in != d_out) else lambda x: x
+            self.res = nn.Linear(
+                d_in, d_out) if res_fc or (d_in != d_out) else lambda x: x
 
         self.dropout = nn.Dropout(dropout)
         # self.layer_norm = nn.LayerNorm(d_in, eps=1e-6)
@@ -241,12 +274,12 @@ class SelfAttentionBranch(nn.Module):
         # Transpose for attention dot product: b x n x lq x dv
         q, k, v = q.transpose(1, 2), k.transpose(1, 2), v.transpose(1, 2)
 
-        att = torch.matmul(q, k.transpose(2, 3))/(self.d_k**0.5)
-        att = self.att_drop(F.softmax(att,dim=3))
+        att = torch.matmul(q, k.transpose(2, 3)) / (self.d_k**0.5)
+        att = self.att_drop(F.softmax(att, dim=3))
 
-        x = torch.matmul(att, v) # NT, H, V, D_v
+        x = torch.matmul(att, v)  # NT, H, V, D_v
 
-        x = x.transpose(1,2).view(NT,V,-1)
+        x = x.transpose(1, 2).view(NT, V, -1)
         x = self.dropout(self.fc(x))
 
         if self.residual:
@@ -256,6 +289,7 @@ class SelfAttentionBranch(nn.Module):
         # Combine the last two dimensions to concatenate all the heads together: b x lq x (n*dv)
 
         return x, att
+
 
 class Graph():
     ''' The Graph to model the 3D skeletal data
@@ -267,7 +301,6 @@ class Graph():
         - spatial
         max_dis_connect: max connection distance
     '''
-
     def __init__(self, strategy='spatial', max_dis_connect=1):
         self.strategy = strategy
         self.max_dis_connect = max_dis_connect
