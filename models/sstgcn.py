@@ -3,6 +3,117 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 #%%
+class SSTGCN(nn.Module):
+
+    def __init__(self, in_channels, num_class, graph_args, edge_importance_weighting=True, **kwargs):
+        super().__init__()
+
+        self.graph = Graph(**graph_args)
+        self.register_buffer('A', torch.tensor(self.graph.A, dtype=torch.float32, requires_grad=False))
+
+        spatial_kernel_size = A.size(0)
+        temporal_kernel_size = 9
+        kernel_size = (temporal_kernel_size, spatial_kernel_size)
+        # self.bn = nn.BatchNorm1d(in_channels * A.size(1))
+        self.bn = nn.BatchNorm2d(in_channels)
+
+        kwargs0 = {k: v for k, v in kwargs.items() if k != 'dropout'}
+
+        self.blocks = nn.ModuleList((
+            GraphConvBlock(in_channels, 32, kernel_size, 1, residual=False, **kwargs0),
+            GraphConvBlock(32, 32, kernel_size, 1, **kwargs),
+            GraphConvBlock(32, 32, kernel_size, 1, **kwargs),
+            GraphConvBlock(32, 32, kernel_size, 1, **kwargs),
+            GraphConvBlock(32, 64, kernel_size, 2, **kwargs),
+            GraphConvBlock(64, 64, kernel_size, 1, **kwargs),
+            GraphConvBlock(64, 64, kernel_size, 1, **kwargs),
+            GraphConvBlock(64, 128, kernel_size, 2, **kwargs),
+            GraphConvBlock(128, 128, kernel_size, 1, **kwargs),
+            GraphConvBlock(128, 128, kernel_size, 1, **kwargs)
+        ))
+
+        if edge_importance_weighting:
+            self.edge_importance = nn.ParameterList([nn.Parameter(torch.ones(self.A.size())) for i in self.blocks])
+        else:
+            self.edge_importance = [1] * len(self.blocks)
+
+        self.fcn = nn.Conv2d(128, num_class, kernel_size=1)
+
+    def get_model_name(self):
+        return self.__class__.__name__
+
+    def forward(self, x):
+
+        N, T, V, C = x.size()
+        x = x.permute(0, 3, 1, 2).contiguous()
+        x = self.bn(x)
+
+        for block, importance in zip(self.blocks, self.edge_importance):
+            x = block(x, self.A * importance)
+
+        hiddens = F.avg_pool2d(x, x.size()[2:]).view(x.size(0), -1)
+
+        x = self.fcn(hiddens)
+
+        return x, hiddens
+
+class GraphConvBlock(nn.Module):
+
+    def __init__(self,
+                 in_channels,
+                 out_channels,
+                 kernel_size,
+                 stride=1,
+                 dropout=0,
+                 residual=True,
+                 attbranch=True,
+                 gate=True,
+                 n_head=4,
+                 d_kc=0.25,
+                 d_vc=0.25
+                 ):
+        super().__init__()
+
+        self.ssgc = SSGC(in_channels, out_channels, kernel_size[1], attbranch=True, gate=True, n_head=4, d_kc=0.25, d_vc=0.25)
+
+        self.tcn = nn.Sequential(
+            nn.Conv2d(
+                out_channels,
+                out_channels,
+                (kernel_size[0], 1),
+                (stride, 1),
+                ((kernel_size[0] - 1) // 2, 0),
+            ),
+            nn.BatchNorm2d(out_channels),
+            nn.Dropout(dropout, inplace=True),
+        )
+
+        if not residual:
+            self.residual = lambda x: 0
+
+        elif (in_channels == out_channels) and (stride == 1):
+            self.residual = lambda x: x
+
+        else:
+            self.residual = nn.Sequential(
+                nn.Conv2d(
+                    in_channels,
+                    out_channels,
+                    kernel_size=1,
+                    stride=(stride, 1)),
+                nn.BatchNorm2d(out_channels),
+            )
+
+        self.relu = nn.ReLU(inplace=True)
+
+    def forward(self, x, A, length=None):
+
+        res = self.residual(x)
+        x = self.ssgc(x, A)
+        x = self.tcn(x) + res
+
+        return self.relu(x)
+
 class SSGC(nn.Module):
 
     def __init__(self,
@@ -49,7 +160,13 @@ class SSGC(nn.Module):
             g = nn.Parameter(torch.tensor(1.0, dtype=torch.float32), requires_grad=True)
             self.register_parameter('g', g)
 
+        self.out = nn.Sequential(
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True)
+        )
+
     def forward(self, x, A):
+
         inp = self.bn(x)
 
         f_c = self.conv(inp)
@@ -71,9 +188,12 @@ class SSGC(nn.Module):
         else:
             f = f_c
 
-        return f.contiguous(), A
+        f = self.out(f)
+
+        return f
 
 class SelfAttentionBranch(nn.Module):
+
     def __init__(self, n_head, d_in, d_out, d_k, d_v, residual=True, res_fc=False, dropout=0.1, att_dropout=0.1):
         super().__init__()
 
@@ -105,7 +225,6 @@ class SelfAttentionBranch(nn.Module):
 
         assert self.d_in == v.size(2)
 
-        # sz_b, len_q, len_k, len_v = q.size(0), q.size(1), k.size(1), v.size(1)
         NT, V, C = v.size()
 
         if self.residual:
@@ -148,6 +267,7 @@ class Graph():
         - spatial
         max_dis_connect: max connection distance
     '''
+
     def __init__(self, strategy='spatial', max_dis_connect=1):
         self.strategy = strategy
         self.max_dis_connect = max_dis_connect
