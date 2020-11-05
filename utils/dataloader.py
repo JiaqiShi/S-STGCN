@@ -31,7 +31,7 @@ class IEMOCAPDataset(Dataset):
 
         self.stream = stream
 
-        pkls = ['motion_test.pkl', 'motion_val.pkl', 'motion_test.pkl']
+        pkls = ['motion_train.pkl', 'motion_val.pkl', 'motion_test.pkl']
         pkl_path = os.path.join(path, pkls[sub_set])
 
         with open(pkl_path, 'rb') as f:
