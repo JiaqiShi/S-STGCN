@@ -185,11 +185,11 @@ class Train_Eval_Model:
                         'test_acc': test_acc
                     }, epoch)
                 if gate_his is True:
-                    for num, net in enumerate(self.model.st_gcn_networks):
-                        if net.gcn.gate is True:
+                    for num, block in enumerate(self.model.blocks):
+                        if block.ssgc.gate is True:
                             writer.add_scalars('gate', {
                                 ('g' + str(num)):
-                                float(net.gcn.g.cpu().detach())
+                                float(block.ssgc.g.cpu().detach())
                             }, epoch)
                         else:
                             print('[Error] gate not activated.')
