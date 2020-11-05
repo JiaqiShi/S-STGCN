@@ -2,7 +2,7 @@ import time
 
 import numpy as np
 import torch
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, recall_score
 
 
 class EarlyStopping:
