@@ -4,6 +4,7 @@ import torch.nn.functional as F
 
 
 class SSTGCN(nn.Module):
+
     def __init__(self,
                  in_channels,
                  num_class,
@@ -67,6 +68,7 @@ class SSTGCN(nn.Module):
 
 
 class GraphConvBlock(nn.Module):
+
     def __init__(self,
                  in_channels,
                  out_channels,
@@ -129,6 +131,7 @@ class GraphConvBlock(nn.Module):
 
 
 class SSGC(nn.Module):
+
     def __init__(self,
                  in_channels,
                  out_channels,
@@ -210,6 +213,7 @@ class SSGC(nn.Module):
 
 
 class SelfAttentionBranch(nn.Module):
+
     def __init__(self,
                  n_head,
                  d_in,
@@ -294,6 +298,7 @@ class Graph():
         - spatial
         max_dis_connect: max connection distance
     '''
+    
     def __init__(self, strategy='spatial', max_dis_connect=1):
         self.strategy = strategy
         self.max_dis_connect = max_dis_connect
