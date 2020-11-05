@@ -24,6 +24,8 @@ def main(args):
     lr = args.lr
     gate_his = args.gate_his
 
+    Model = import_class('models.'+args.model)
+
 if __name__ == '__main__':
 
     p = argparse.ArgumentParser()
@@ -38,7 +40,7 @@ if __name__ == '__main__':
     p.add_argument('--model', type=str, default='att_st_gcn.Model')
     p.add_argument('--dataset', type=str, default='IEMOCAPDataset')
     p.add_argument('--motion_extend', type=str2bool, default=False)
-    p.add_argument('--stream', type=str, default='J')
+    p.add_argument('--stream', type=str, default='Joint')
     p.add_argument('--gate_his', type=str2bool, default=True)
 
     p.add_argument('--graph', type=str, default='model.st_gcn.Graph')
