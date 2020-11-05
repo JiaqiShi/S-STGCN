@@ -6,6 +6,10 @@ Right now, we’re in your first GitHub **repository**. A repository is like a f
 
 This repository contains three important files: The HTML code for your first website on GitHub, the CSS stylesheet that decorates your website with colors and fonts, and the **README** file. It also contains an image folder, with one image file.
 
+## Preprocessed data
+
+Download the preprocessed skeleton data from [Google Drive](https://drive.google.com/file/d/1yK1_o5Jv5syCafYsiwxM9XH82M1JYxLZ/view?usp=sharing). Then unzip them and put them in `./data`.
+
 ## Describe your project
 
 You are currently viewing your project's **README** file. **_README_** files are like cover pages or elevator pitches for your project. They are written in plain text or [Markdown language](https://guides.github.com/features/mastering-markdown/), and usually include a paragraph describing the project, directions on how to use it, who authored it, and more.
