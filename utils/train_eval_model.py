@@ -113,6 +113,7 @@ class Train_Eval_Model:
             loss = self.loss_func(outputs, y)
             if train:
                 # loss.backward(retain_graph=True)
+                loss.backward()
                 self.optimizer.step()
             losses.append(loss.item())
 

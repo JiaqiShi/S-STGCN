@@ -1,6 +1,9 @@
 import argparse
 
 import torch
+import numpy as np
+import os
+from tensorboardX import SummaryWriter
 
 from utils.dataloader import IEMOCAPDataset, get_IEMO_dataloaders
 from utils.train_eval_model import EarlyStopping, Train_Eval_Model
@@ -108,7 +111,7 @@ if __name__ == '__main__':
     p.add_argument('--lr_scheduler', type=str2bool, default=True)
     p.add_argument('--weighted_loss', type=str2bool, default=True)
 
-    p.add_argument('--model', type=str, default='SSTGCN')
+    p.add_argument('--model', type=str, default='sstgcn.SSTGCN')
     p.add_argument('--dataset', type=str, default='IEMOCAPDataset')
     p.add_argument('--stream', type=str, default='joint')
     p.add_argument('--gate_his', type=str2bool, default=True)
@@ -123,3 +126,5 @@ if __name__ == '__main__':
     p.add_argument('--d_vc', type=float, default=0.25)
 
     args = p.parse_args()
+
+    main(args)

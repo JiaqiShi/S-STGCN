@@ -41,7 +41,7 @@ class IEMOCAPDataset(Dataset):
             self.boneData = {}
             target_index = [i for i in range(10)]
             source_index = [0, 0, 1, 2, 2, 4, 5, 2, 7, 8]
-            for k, v in self.jointData:
+            for k, v in self.jointData.items():
                 self.boneData[k] = v[:, target_index, :] - v[:, source_index, :]
 
         self.len = len(self.ids)

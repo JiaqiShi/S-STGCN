@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+import numpy as np
 
 class SSTGCN(nn.Module):
 
@@ -14,11 +15,8 @@ class SSTGCN(nn.Module):
         super().__init__()
 
         self.graph = Graph(**graph_args)
-        self.register_buffer(
-            'A',
-            torch.tensor(self.graph.A,
-                         dtype=torch.float32,
-                         requires_grad=False))
+        A = torch.tensor(self.graph.A, dtype=torch.float32, requires_grad=False)
+        self.register_buffer('A', A)
 
         spatial_kernel_size = A.size(0)
         temporal_kernel_size = 9
@@ -46,7 +44,7 @@ class SSTGCN(nn.Module):
         else:
             self.edge_importance = [1] * len(self.blocks)
 
-        self.fcn = nn.Conv2d(128, num_class, kernel_size=1)
+        self.fcn = nn.Linear(128, num_class)
 
     def get_model_name(self):
         return self.__class__.__name__
@@ -241,8 +239,6 @@ class SelfAttentionBranch(nn.Module):
 
         self.fc = nn.Linear(n_head * d_v, d_out, bias=False)
 
-        self.attention = ScaledAttention(temperature=d_k**0.5)
-
         if residual:
             self.res = nn.Linear(
                 d_in, d_out) if res_fc or (d_in != d_out) else lambda x: x
@@ -276,7 +272,7 @@ class SelfAttentionBranch(nn.Module):
 
         x = torch.matmul(att, v)  # NT, H, V, D_v
 
-        x = x.transpose(1, 2).view(NT, V, -1)
+        x = x.transpose(1, 2).contiguous().view(NT, V, -1)
         x = self.dropout(self.fc(x))
 
         if self.residual:
