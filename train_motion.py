@@ -16,6 +16,14 @@ def import_class(name):
         mod = getattr(mod, comp)
     return mod
 
+def str2bool(v):
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('[Error] Unsupported value encountered.')
+
 def main(args):
 
     epoch_num = args.epoch_num
@@ -41,8 +49,8 @@ def main(args):
     else:
         raise ValueError('[Error] Stream not existing.')
     
-    kw = {'attbranch':}
-    model = Model(3,class_num,graph_args)
+    kw = {'attbranch':args.attbranch,'gate':args.gate,'n_head':args.n_head,'d_kc':args.d_kc,'d_vc':args.d_vc}
+    model = Model(3,class_num,graph_args,**kw)
 
 if __name__ == '__main__':
 
@@ -54,7 +62,6 @@ if __name__ == '__main__':
     p.add_argument('--batch_size', type=int, default=8)
     p.add_argument('--lr', type=float, default=1e-4)
 
-    # p.add_argument('--model', type=str, default='st_gcn.Multi_stream')
     p.add_argument('--model', type=str, default='SSTGCN')
     p.add_argument('--dataset', type=str, default='IEMOCAPDataset')
     p.add_argument('--motion_extend', type=str2bool, default=False)
