@@ -41,6 +41,7 @@ def main(args):
     lr = args.lr
     lr_scheduler = args.lr_scheduler
     weighted_loss = args.weighted_loss
+    optimizer = args.optimizer
 
     gate_his = args.gate_his
     stream = args.stream
@@ -96,7 +97,7 @@ def main(args):
     else:
         lossfunc = torch.nn.CrossEntropyLoss()
 
-    train_eval = Train_Eval_Model(model,lr=lr,loss_func=lossfunc,device=device,lr_scheduler=lr_scheduler)
+    train_eval = Train_Eval_Model(model,optim=optimizer,lr=lr,loss_func=lossfunc,device=device,lr_scheduler=lr_scheduler)
     train_eval.train_model(train_loader,val_loader,test_loader,index,epoch_num,earlystop=earlystop,writer=writer,gate_his=gate_his)
 
 if __name__ == '__main__':
@@ -110,6 +111,7 @@ if __name__ == '__main__':
     p.add_argument('--lr', type=float, default=1e-4)
     p.add_argument('--lr_scheduler', type=str2bool, default=True)
     p.add_argument('--weighted_loss', type=str2bool, default=True)
+    p.add_argument('--optimizer', type=str, default='adam')
 
     p.add_argument('--model', type=str, default='sstgcn.SSTGCN')
     p.add_argument('--dataset', type=str, default='IEMOCAPDataset')
