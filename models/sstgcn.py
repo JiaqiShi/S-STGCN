@@ -9,12 +9,15 @@ class SSTGCN(nn.Module):
     def __init__(self,
                  in_channels,
                  num_class,
-                 graph_args,
+                 graph_args=None,
                  edge_importance_weighting=True,
                  **kwargs):
         super().__init__()
 
-        self.graph = Graph(**graph_args)
+        if graph_args is not None:
+            self.graph = Graph(**graph_args)
+        else:
+            self.graph = Graph()
         A = torch.tensor(self.graph.A, dtype=torch.float32, requires_grad=False)
         self.register_buffer('A', A)
 
