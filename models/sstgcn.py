@@ -21,8 +21,8 @@ class SSTGCN(nn.Module):
         spatial_kernel_size = A.size(0)
         temporal_kernel_size = 9
         kernel_size = (temporal_kernel_size, spatial_kernel_size)
-        # self.bn = nn.BatchNorm1d(in_channels * A.size(1))
-        self.bn = nn.BatchNorm2d(in_channels)
+        self.bn = nn.BatchNorm1d(in_channels * A.size(1))
+        # self.bn = nn.BatchNorm2d(in_channels)
 
         kwargs0 = {k: v for k, v in kwargs.items() if k != 'dropout'}
 
@@ -52,8 +52,12 @@ class SSTGCN(nn.Module):
     def forward(self, x):
 
         N, T, V, C = x.size()
-        x = x.permute(0, 3, 1, 2).contiguous()
+        # x = x.permute(0, 3, 1, 2).contiguous()
+        # x = self.bn(x)
+
+        x = x.permute(0, 2, 3, 1).contiguous().view(N, V * C, T)
         x = self.bn(x)
+        x = x.view(N, V, C, T).permute(0, 2, 3, 1).contiguous()
 
         for block, importance in zip(self.blocks, self.edge_importance):
             x = block(x, self.A * importance)
