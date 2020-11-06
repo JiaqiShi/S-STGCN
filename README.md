@@ -12,6 +12,24 @@ This repository contains three important files: The HTML code for your first web
 
 Download the preprocessed skeleton data from [Google Drive](https://drive.google.com/file/d/1yK1_o5Jv5syCafYsiwxM9XH82M1JYxLZ/view?usp=sharing). Then unzip them and put them in `./data`.
 
+## Note
+
+Due to the random number and batch size, the results of each traning may be inconsistent. In the future, we will try to eliminate the interference of random factors.
+
+## Training
+
+To train on the joint stream, please run
+
+```
+python train_motion.py
+```
+
+To train on the bone stream, please run
+
+```
+python train_motion.py --stream bone
+```
+
 ## Describe your project
 
 You are currently viewing your project's **README** file. **_README_** files are like cover pages or elevator pitches for your project. They are written in plain text or [Markdown language](https://guides.github.com/features/mastering-markdown/), and usually include a paragraph describing the project, directions on how to use it, who authored it, and more.
