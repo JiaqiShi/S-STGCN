@@ -29,6 +29,10 @@ To train on the bone stream, please run
 ```
 python train_motion.py --stream bone
 ```
+
+## Contact
+
+For any question, please contact ```shi.jiaqi@irl.sys.es.osaka-u.ac.jp```
 <!-- 
 ## Describe your project
 
