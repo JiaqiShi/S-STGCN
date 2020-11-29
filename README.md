@@ -12,9 +12,9 @@ This repository contains three important files: The HTML code for your first web
 
 Download the preprocessed skeleton data from [Google Drive](https://drive.google.com/file/d/1yK1_o5Jv5syCafYsiwxM9XH82M1JYxLZ/view?usp=sharing). Then unzip them and put them in `./data`.
 
-## Note
+<!-- ## Note
 
-Due to the random number and batch size, the results of each traning may be inconsistent. In the future, we will try to eliminate the interference of random factors.
+Due to the random number and batch size, the results of each traning may be inconsistent. In the future, we will try to eliminate the interference of random factors. -->
 
 ## Training
 
