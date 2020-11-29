@@ -27,7 +27,6 @@ class SSTGCN(nn.Module):
         temporal_kernel_size = 9
         kernel_size = (temporal_kernel_size, spatial_kernel_size)
         self.bn = nn.BatchNorm1d(in_channels * A.size(1))
-        # self.bn = nn.BatchNorm2d(in_channels)
 
         kwargs0 = {k: v for k, v in kwargs.items() if k != 'dropout'}
 
@@ -61,17 +60,8 @@ class SSTGCN(nn.Module):
 
     def forward(self, x):
 
-        # N, T, V, C = x.size()
-        # x = x.permute(0, 3, 1, 2).contiguous()
-        # x = self.bn(x)
-
-        # x = x.permute(0, 2, 3, 1).contiguous().view(N, V * C, T)
-        # x = self.bn(x)
-        # x = x.view(N, V, C, T).permute(0, 2, 3, 1).contiguous()
-
         N, C, T, V = x.size()
 
-        # x = x.contiguous().view(N, C, T, V)
         x = x.permute(0, 3, 1, 2).contiguous().view(N, V * C, T)
         x = self.bn(x)
         x = x.view(N, V, C, T).permute(0, 2, 3, 1).contiguous()
@@ -279,13 +269,10 @@ class SelfAttentionBranch(nn.Module):
 
         q = self.layer_norm(q)
 
-        # Pass through the pre-attention projection: b x lq x (n*dv)
-        # Separate different heads: b x lq x n x dv
         q = self.w_q(q).view(NT, V, self.n_head, self.d_k)
         k = self.w_k(k).view(NT, V, self.n_head, self.d_k)
         v = self.w_v(v).view(NT, V, self.n_head, self.d_v)
 
-        # Transpose for attention dot product: b x n x lq x dv
         q, k, v = q.transpose(1, 2), k.transpose(1, 2), v.transpose(1, 2)
 
         att = torch.matmul(q, k.transpose(2, 3)) / (self.d_k**0.5)
@@ -298,9 +285,6 @@ class SelfAttentionBranch(nn.Module):
 
         if self.residual:
             x += res
-
-        # Transpose to move the head dimension back: b x lq x n x dv
-        # Combine the last two dimensions to concatenate all the heads together: b x lq x (n*dv)
 
         return x, att
 
