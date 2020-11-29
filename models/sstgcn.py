@@ -4,8 +4,8 @@ import torch.nn.functional as F
 
 import numpy as np
 
-class SSTGCN(nn.Module):
 
+class SSTGCN(nn.Module):
     def __init__(self,
                  in_channels,
                  num_class,
@@ -18,7 +18,9 @@ class SSTGCN(nn.Module):
             self.graph = Graph(**graph_args)
         else:
             self.graph = Graph()
-        A = torch.tensor(self.graph.A, dtype=torch.float32, requires_grad=False)
+        A = torch.tensor(self.graph.A,
+                         dtype=torch.float32,
+                         requires_grad=False)
         self.register_buffer('A', A)
 
         spatial_kernel_size = A.size(0)
@@ -30,7 +32,12 @@ class SSTGCN(nn.Module):
         kwargs0 = {k: v for k, v in kwargs.items() if k != 'dropout'}
 
         self.blocks = nn.ModuleList(
-            (GraphConvBlock(in_channels, 32, kernel_size, 1, residual=False, **kwargs0),
+            (GraphConvBlock(in_channels,
+                            32,
+                            kernel_size,
+                            1,
+                            residual=False,
+                            **kwargs0),
              GraphConvBlock(32, 32, kernel_size, 1, **kwargs),
              GraphConvBlock(32, 32, kernel_size, 1, **kwargs),
              GraphConvBlock(32, 32, kernel_size, 1, **kwargs),
@@ -80,7 +87,6 @@ class SSTGCN(nn.Module):
 
 
 class GraphConvBlock(nn.Module):
-
     def __init__(self,
                  in_channels,
                  out_channels,
@@ -143,7 +149,6 @@ class GraphConvBlock(nn.Module):
 
 
 class SSGC(nn.Module):
-
     def __init__(self,
                  in_channels,
                  out_channels,
@@ -225,7 +230,6 @@ class SSGC(nn.Module):
 
 
 class SelfAttentionBranch(nn.Module):
-
     def __init__(self,
                  n_head,
                  d_in,
@@ -311,7 +315,6 @@ class Graph():
         - spatial
         max_dis_connect: max connection distance
     '''
-    
     def __init__(self, strategy='spatial', max_dis_connect=1):
         self.strategy = strategy
         self.max_dis_connect = max_dis_connect
