@@ -54,11 +54,18 @@ class SSTGCN(nn.Module):
 
     def forward(self, x):
 
-        N, T, V, C = x.size()
+        # N, T, V, C = x.size()
         # x = x.permute(0, 3, 1, 2).contiguous()
         # x = self.bn(x)
 
-        x = x.permute(0, 2, 3, 1).contiguous().view(N, V * C, T)
+        # x = x.permute(0, 2, 3, 1).contiguous().view(N, V * C, T)
+        # x = self.bn(x)
+        # x = x.view(N, V, C, T).permute(0, 2, 3, 1).contiguous()
+
+        N, C, T, V = x.size()
+
+        # x = x.contiguous().view(N, C, T, V)
+        x = x.permute(0, 3, 1, 2).contiguous().view(N, V * C, T)
         x = self.bn(x)
         x = x.view(N, V, C, T).permute(0, 2, 3, 1).contiguous()
 
@@ -91,11 +98,11 @@ class GraphConvBlock(nn.Module):
         self.ssgc = SSGC(in_channels,
                          out_channels,
                          kernel_size[1],
-                         attbranch=True,
-                         gate=True,
-                         n_head=4,
-                         d_kc=0.25,
-                         d_vc=0.25)
+                         attbranch=attbranch,
+                         gate=gate,
+                         n_head=n_head,
+                         d_kc=d_kc,
+                         d_vc=d_vc)
 
         self.tcn = nn.Sequential(
             nn.Conv2d(
@@ -251,7 +258,7 @@ class SelfAttentionBranch(nn.Module):
                 d_in, d_out) if res_fc or (d_in != d_out) else lambda x: x
 
         self.dropout = nn.Dropout(dropout)
-        # self.layer_norm = nn.LayerNorm(d_in, eps=1e-6)
+        self.layer_norm = nn.LayerNorm(d_in, eps=1e-6)
         self.att_drop = nn.Dropout(att_dropout)
 
     def forward(self, q, k, v):
@@ -263,7 +270,7 @@ class SelfAttentionBranch(nn.Module):
         if self.residual:
             res = self.res(v)
 
-        # q = self.layer_norm(q)
+        q = self.layer_norm(q)
 
         # Pass through the pre-attention projection: b x lq x (n*dv)
         # Separate different heads: b x lq x n x dv
