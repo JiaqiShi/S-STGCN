@@ -235,7 +235,8 @@ class SelfAttentionBranch(nn.Module):
                  residual=True,
                  res_fc=False,
                  dropout=0.1,
-                 att_dropout=0.1):
+                 att_dropout=0.1,
+                 layer_norm=True):
         super().__init__()
 
         self.n_head = n_head
@@ -258,7 +259,9 @@ class SelfAttentionBranch(nn.Module):
                 d_in, d_out) if res_fc or (d_in != d_out) else lambda x: x
 
         self.dropout = nn.Dropout(dropout)
-        self.layer_norm = nn.LayerNorm(d_in, eps=1e-6)
+        self.layer_norm = layer_norm
+        if layer_norm:
+            self.layer_norm = nn.LayerNorm(d_in, eps=1e-6)
         self.att_drop = nn.Dropout(att_dropout)
 
     def forward(self, q, k, v):
