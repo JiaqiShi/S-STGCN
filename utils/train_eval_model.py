@@ -77,7 +77,7 @@ class Train_Eval_Model:
 
         if lr_scheduler:
             self.scheduler = torch.optim.lr_scheduler.MultiStepLR(
-                self.optimizer, milestones=[60, 90], gamma=0.1)
+                self.optimizer, milestones=[60], gamma=0.1)
 
         print('[Info] #Para: ', self.get_param_num())
 
@@ -112,8 +112,7 @@ class Train_Eval_Model:
 
             loss = self.loss_func(outputs, y)
             if train:
-                # loss.backward(retain_graph=True)
-                loss.backward()
+                loss.backward(retain_graph=True)
                 self.optimizer.step()
             losses.append(loss.item())
 

@@ -25,7 +25,7 @@ def get_IEMO_dataloaders(dataset=None, batch_size=2, stream='J'):
 
 class IEMOCAPDataset(Dataset):
     def __init__(self,
-                 path='/home/shi/git/s-stgcn/data',
+                 path='./data',
                  stream='J',
                  sub_set=0):
 
@@ -52,15 +52,15 @@ class IEMOCAPDataset(Dataset):
     def __getitem__(self, index):
         key = self.ids[index]
         if self.stream == 'J':
-            return torch.FloatTensor(self.jointData[key]),\
+            return torch.FloatTensor(self.jointData[key]).contiguous().view(3,-1,10),\
                      torch.tensor(self.labels[key], dtype=torch.long),\
                      key
         elif self.stream == 'B':
-            return torch.FloatTensor(self.boneData[key]),\
+            return torch.FloatTensor(self.boneData[key]).contiguous().view(3,-1,10),\
                      torch.tensor(self.labels[key], dtype=torch.long),\
                      key
         else:
-            return torch.FloatTensor(self.jointData[key]),\
-                    torch.FloatTensor(self.boneData[key]),\
+            return torch.FloatTensor(self.jointData[key]).contiguous().view(3,-1,10),\
+                    torch.FloatTensor(self.boneData[key]).contiguous().view(3,-1,10),\
                     torch.tensor(self.labels[key], dtype=torch.long),\
                     key
