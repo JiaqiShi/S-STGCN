@@ -8,6 +8,8 @@ S-STGCN: Self-attention enhanced Spatial Temporal Graph Convolutional Network fo
 
 Download the preprocessed skeleton data from [Google Drive](https://drive.google.com/file/d/1yK1_o5Jv5syCafYsiwxM9XH82M1JYxLZ/view?usp=sharing). Then unzip them and put them in `./data`.
 
+If you want to download the original IEMOCAP dataset, please submit your request to [the IEMOCAP team](https://sail.usc.edu/iemocap/index.html).
+
 ## Training
 
 To train the model, please run
