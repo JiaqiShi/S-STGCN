@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, Dataset, random_split
 
 
-def get_IEMO_dataloaders(dataset=None, batch_size=2, stream='J'):
+def get_IEMO_dataloaders(dataset=None, batch_size=2, stream='joint'):
 
     if dataset is None:
         dataset = IEMOCAPDataset
@@ -26,7 +26,7 @@ def get_IEMO_dataloaders(dataset=None, batch_size=2, stream='J'):
 class IEMOCAPDataset(Dataset):
     def __init__(self,
                  path='./data',
-                 stream='J',
+                 stream='joint',
                  sub_set=0):
 
         self.stream = stream
@@ -37,7 +37,7 @@ class IEMOCAPDataset(Dataset):
         with open(pkl_path, 'rb') as f:
             self.ids, self.jointData, self.labels = pickle.load(f)
 
-        if stream is not 'J':
+        if stream is not 'joint':
             self.boneData = {}
             target_index = [i for i in range(10)]
             source_index = [0, 0, 1, 2, 2, 4, 5, 2, 7, 8]
@@ -51,11 +51,11 @@ class IEMOCAPDataset(Dataset):
 
     def __getitem__(self, index):
         key = self.ids[index]
-        if self.stream == 'J':
+        if self.stream == 'joint':
             return torch.FloatTensor(self.jointData[key]).contiguous().view(3,-1,10),\
                      torch.tensor(self.labels[key], dtype=torch.long),\
                      key
-        elif self.stream == 'B':
+        elif self.stream == 'bone':
             return torch.FloatTensor(self.boneData[key]).contiguous().view(3,-1,10),\
                      torch.tensor(self.labels[key], dtype=torch.long),\
                      key
