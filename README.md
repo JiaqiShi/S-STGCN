@@ -12,17 +12,17 @@ If you want to download the original IEMOCAP dataset, please submit your request
 
 ## Training
 
-To train the model, please run
+To train on the joint stream, please run
 
 ```
 python train_motion.py
 ```
-<!-- 
+
 To train on the bone stream, please run
 
 ```
 python train_motion.py --stream bone
-``` -->
+```
 
 ## Contact
 
