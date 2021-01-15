@@ -6,8 +6,7 @@ S-STGCN: Self-attention enhanced Spatial Temporal Graph Convolutional Network fo
 
 ## Preprocessed data
 
-Get the preprocessed skeleton data 
-[Application Form](https://forms.gle/2snjzMrJkHPz8Pyg9)
+Get the preprocessed skeleton data url using [Application Form](https://forms.gle/2snjzMrJkHPz8Pyg9)
 
 If you want to download the preprocessed skeleton data, please ask the license to [the IEMOCAP team](https://sail.usc.edu/iemocap/index.html) first. Then contact us and attach your IEMOCAP license to the email. We will send you the password as soon as possible.
 
