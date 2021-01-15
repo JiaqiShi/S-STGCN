@@ -1,8 +1,8 @@
-# Self-attention enhanced Spatial Temporal Graph Convolutional Network for Skeleton-based Emotion Recognition
+# Skeleton-Based Emotion Recognition Based on Two-Stream Self-Attention Enhanced Spatial-Temporal Graph Convolutional Network
 
 ## Introduction
 
-S-STGCN: Self-attention enhanced Spatial Temporal Graph Convolutional Network for Skeleton-based Emotion Recognition
+Skeleton-Based Emotion Recognition Based on Two-Stream Self-Attention Enhanced Spatial-Temporal Graph Convolutional Network
 
 ## Preprocessed data
 
