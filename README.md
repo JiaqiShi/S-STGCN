@@ -1,12 +1,16 @@
-# Self-attention enhanced Spatial Temporal Graph Convolutional Network for Skeleton-based Emotion Recognition
+# Skeleton-Based Emotion Recognition Based on Two-Stream Self-Attention Enhanced Spatial-Temporal Graph Convolutional Network
 
 ## Introduction
 
-S-STGCN: Self-attention enhanced Spatial Temporal Graph Convolutional Network for Skeleton-based Emotion Recognition
+Skeleton-Based Emotion Recognition Based on Two-Stream Self-Attention Enhanced Spatial-Temporal Graph Convolutional Network
 
 ## Preprocessed data
 
-Download the preprocessed skeleton data from [Google Drive](https://drive.google.com/file/d/1yK1_o5Jv5syCafYsiwxM9XH82M1JYxLZ/view?usp=sharing). Then unzip them and put them in `./data`.
+Get the preprocessed skeleton data url using [Application Form](https://forms.gle/2snjzMrJkHPz8Pyg9)
+
+If you want to download the preprocessed skeleton data, please ask the license to [the IEMOCAP team](https://sail.usc.edu/iemocap/index.html) first. Then contact us and attach your IEMOCAP license to the email. We will send you the password as soon as possible.
+
+After downloading the preprocessed skeleton data, please unzip them and put them in `./data`.
 
 If you want to download the original IEMOCAP dataset, please submit your request to [the IEMOCAP team](https://sail.usc.edu/iemocap/index.html).
 
@@ -22,6 +26,22 @@ To train on the bone stream, please run
 
 ```
 python train_motion.py --stream bone
+```
+
+## Cite
+
+When you use our model/code/data, please cite
+```
+@article{shi2021skeleton,
+  title={Skeleton-Based Emotion Recognition Based on Two-Stream Self-Attention Enhanced Spatial-Temporal Graph Convolutional Network},
+  author={Shi, Jiaqi and Liu, Chaoran and Ishi, Carlos Toshinori and Ishiguro, Hiroshi},
+  journal={Sensors},
+  volume={21},
+  number={1},
+  pages={205},
+  year={2021},
+  publisher={Multidisciplinary Digital Publishing Institute}
+}
 ```
 
 ## Contact
